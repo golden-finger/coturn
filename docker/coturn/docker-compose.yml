@@ -1,0 +1,37 @@
+version: "3.3"
+services:
+
+# coTURN
+  coturn:
+    image: deepsecs/coturn
+    network_mode: "host"
+    hostname: coturn
+    domainname: deepsecs.com
+    build:
+      context: ./coturn
+    restart: always
+    volumes:
+      - ${PWD}/coturn/turnserver.conf:/usr/local/etc/turnserver.conf
+        #      - ${PWD}/coturn/privkey.pem:/etc/ssl/private/privkey.pem
+        #      - ${PWD}/coturn/cert.pem:/etc/ssl/certs/cert.pem
+    ports:
+## STUN/TURN
+      - "3478:3478"
+      - "3478:3478/udp"
+      - "3479:3479"
+      - "3479:3479/udp"
+
+  nextcloud:
+    image: deepsecs/nextcloud
+    hostname: nxtalk
+    domainname: deepsecs.com
+    #    environment:
+            #      - SQLITE_DATABASE=/var/lib/db/nxcloud.db
+    volumes:
+      - ${PWD}/nextcloud/data:/var/www/html/data
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - coturn
+
